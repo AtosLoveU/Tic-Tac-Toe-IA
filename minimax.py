@@ -2,6 +2,8 @@
 # algorithme max / mini
 # calcul de la plus grande valeur
 
+import random
+
 win_condition = [(1,2,3), (4,5,6), (7,8,9), #lignes
                  (1,4,7), (2,5,8), (3,6,9), #colonnes
                  (1,5,9), (3,5,7) #diagonales
@@ -9,22 +11,47 @@ win_condition = [(1,2,3), (4,5,6), (7,8,9), #lignes
 def win_draw(tab_TTT):
     for win_liste in win_condition:
         if tab_TTT[win_liste[0]-1] == tab_TTT[win_liste[1]-1] == tab_TTT[win_liste[2]-1] == 'X': #victoire de X
-            print("+10")
-            break
+            return 1
         if tab_TTT[win_liste[0]-1] == tab_TTT[win_liste[1]-1] == tab_TTT[win_liste[2]-1] == 'O': #victoire de O
-            print("-10")
-            break
-    if sum(element.count('-') for element in tab_TTT) == 0: #condition de nulle
-        print("nulle")
+            return -1
+    if '-' not in tab_TTT:  # condition de nulle
+        return 0
             
-def minimax():
-    null
+
+def minimax(tab_TTT, joueur):
+    result = win_draw(tab_TTT)
+    if result is not None:
+        return result, None
+    else:
+        if joueur == 1:
+            meilleur_score = -float('inf')
+            meilleur_case = None
+            for chaque_case in range(len(tab_TTT)):
+                if tab_TTT[chaque_case] == '-':
+                    tab_TTT[chaque_case] = 'X'
+                    score, _ = minimax(tab_TTT, 0)
+                    tab_TTT[chaque_case] = '-'
+                    if score > meilleur_score:
+                        meilleur_score = score
+                        meilleur_case = chaque_case
+            return meilleur_score, meilleur_case
+        else:
+            meilleur_score = float('inf')
+            for chaque_case in range(len(tab_TTT)):
+                if tab_TTT[chaque_case] == '-':
+                    tab_TTT[chaque_case] = 'O'
+                    score, _ = minimax(tab_TTT, 1)
+                    tab_TTT[chaque_case] = '-'
+                    if score < meilleur_score:
+                        meilleur_score = score
+                        meilleur_case = chaque_case
+            return meilleur_score, meilleur_case
             
             
 def main():
-    tab = ["X","O","O",
-           "O","X","X",
-           "X","O","O"]
-    win_draw(tab)
-    
+    tab = ['-','-','-',
+           '-','-','-',
+           '-','-','-']
+    print(minimax(tab,1))
+
 main()
