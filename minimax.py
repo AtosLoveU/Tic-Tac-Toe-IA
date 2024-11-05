@@ -2,7 +2,8 @@
 # algorithme max / mini
 # calcul de la plus grande valeur
 
-import random
+import sys
+
 
 win_condition = [(1,2,3), (4,5,6), (7,8,9), #lignes
                  (1,4,7), (2,5,8), (3,6,9), #colonnes
@@ -16,7 +17,7 @@ def win_draw(tab_TTT):
             return -1
     if '-' not in tab_TTT:  # condition de nulle
         return 0
-            
+    return None       
 
 def minimax(tab_TTT, joueur):
     result = win_draw(tab_TTT)
@@ -46,12 +47,15 @@ def minimax(tab_TTT, joueur):
                         meilleur_score = score
                         meilleur_case = chaque_case
             return meilleur_score, meilleur_case
-            
-            
-def main():
-    tab = ['-','-','-',
-           '-','-','-',
-           '-','-','-']
-    print(minimax(tab,1))
+        
+if __name__ == '__main__':
+    board = sys.argv[1]
+    
+    board_list = list(board)
+    
+    _, best_move = minimax(board_list, 0)
 
-main()
+    if best_move is None:
+        print(-1)
+    else:
+        print(best_move)

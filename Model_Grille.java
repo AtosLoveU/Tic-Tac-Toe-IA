@@ -52,5 +52,24 @@ public class Model_Grille {
 		}
 		return true;
 	}	
+
+	public void affichageGrille() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				Model_Cells.CellState etat = this.tableau[i][j].getEtat();
+				if (etat == Model_Cells.CellState.EMPTY) {
+					System.out.print("_ ");
+				} else if (etat == Model_Cells.CellState.X) {
+					System.out.print("X ");
+				} else if (etat == Model_Cells.CellState.O) {
+					System.out.print("O ");
+				}
+			}
+			System.out.println();
+		}
+	}
+
+
+	
 }
 

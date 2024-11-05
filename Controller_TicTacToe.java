@@ -7,9 +7,7 @@ import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
 import java.io.IOException;
-
 
 public class Controller_TicTacToe {
     
@@ -23,13 +21,17 @@ public class Controller_TicTacToe {
     private TextField joueurGagnant;
     private Stage victoryStage;
     
+    private int isIA;
     
     
     private Model_Jeu Model_Jeu = new Model_Jeu();
     Model_Grille Model_Grille = new Model_Grille();
     Model_Cells cellsClicked = new Model_Cells(0,0,Model_Cells.CellState.EMPTY);
-    
-    
+    private PythonAIHandler pythonAIHandler = new PythonAIHandler("C:\\Users\\loris\\PROJET-VSCODE\\Projet_Morpion_IA\\Tic-Tac-Toe-IA\\minimax.py");
+
+    public void setIsIA(int isIA) {
+        this.isIA = isIA;
+    }
     
     private void openVictoryWindow() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("View_Win.fxml"));
@@ -52,11 +54,17 @@ public class Controller_TicTacToe {
         victoryStage.setScene(new Scene(Node1));
         victoryStage.initModality(Modality.APPLICATION_MODAL); 
         victoryStage.setResizable(false);
+
+        victoryStage.setOnCloseRequest(event -> {
+            Stage primaryStage = (Stage) joueurActuel.getScene().getWindow();
+            primaryStage.close();
+        });
+
         victoryStage.showAndWait(); 
     }
     
 
-    
+    // au moment du clique d'un joueur
     @FXML
     private void handleButtonClick(ActionEvent event) throws IOException {
         Button clickedButton = (Button) event.getSource();        
@@ -100,7 +108,6 @@ public class Controller_TicTacToe {
 		default:
 			break;
     }
-
         if (
         	!clickedButton.getText().isEmpty()) {
             return;
@@ -108,13 +115,14 @@ public class Controller_TicTacToe {
     	if(	
             Model_Jeu.getJoueur() == 0) {
             clickedButton.setText("X");
-            clickedButton.setStyle("-fx-font-size: 50px;");
+            clickedButton.setStyle("-fx-font-size: 50px; -fx-font-family: 'DejaVu Sans';");
             Model_Grille.getTableau()[cellsClicked.getx()][cellsClicked.gety()].setEtat(Model_Cells.CellState.X);
             joueurActuel.setText("Tour du Joueur : O");
             }
         else{
         	clickedButton.setText("O");
-            clickedButton.setStyle("-fx-font-size: 50px;");
+            clickedButton.setStyle("-fx-font-size: 50px; -fx-font-family: 'DejaVu Sans';");
+
             Model_Grille.getTableau()[cellsClicked.getx()][cellsClicked.gety()].setEtat(Model_Cells.CellState.O);
             joueurActuel.setText("Tour du Joueur : X");
         };
@@ -122,10 +130,22 @@ public class Controller_TicTacToe {
         if(clickedButton.getId() != "restart" || clickedButton.getId() != "restartWin"){
             Model_Jeu.Tour();
         }
-        
+
+        //Partie où l'ia joue
+        if(isIA == 1) {
+            if (Model_Jeu.getJoueur() == 1) {
+                String boardState = getBoardState();
+                int bestMove = pythonAIHandler.getBestMove(boardState);
+                if (bestMove != -1) {
+                    playAIMove(bestMove);
+                }
+            }
+        }
+
         if(Model_Grille.DrawCondition() || Model_Grille.winCondition()) {
         	openVictoryWindow();
         }
+
     }
     
         @FXML
@@ -144,6 +164,40 @@ public class Controller_TicTacToe {
             joueurActuel.setText("Tour du Joueur : X");
         }
 
- 
+    
+	public String getBoardState() {
+        StringBuilder board = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Model_Cells.CellState state = Model_Grille.getTableau()[i][j].getEtat();
+                if (state == Model_Cells.CellState.X) {
+                    board.append("X");
+                } else if (state == Model_Cells.CellState.O) {
+                    board.append("O");
+                } else {
+                    board.append("-");
+                }
+            }
+        }
+        return board.toString(); 
+    }
+
+
+    private void playAIMove(int move) {
+        if (move == -1) {
+            return;
+        }
         
+        Button[] buttons = {button1, button2, button3, button4, button5, button6, button7, button8, button9};
+        Button selectedButton = buttons[move];
+        if (selectedButton.getText().isEmpty()) {
+            selectedButton.setText("O");
+            selectedButton.setStyle("-fx-font-size: 50px; -fx-font-family: 'DejaVu Sans';");
+            Model_Grille.getTableau()[(move) / 3][(move) % 3].setEtat(Model_Cells.CellState.O);
+            joueurActuel.setText("Tour du Joueur : X");
+            Model_Jeu.Tour();
+        }
+    }
+    
+    
 }

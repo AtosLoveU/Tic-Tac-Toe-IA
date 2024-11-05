@@ -20,7 +20,7 @@
    <top>
       <TextField fx:id="joueurGagnant" alignment="CENTER" editable="false" prefHeight="41.0" prefWidth="1100.0" text="Victoire du joueur : X" BorderPane.alignment="CENTER">
          <font>
-            <Font size="15.0" />
+            <Font name="Corbel" size="20.0" />
          </font>
          <BorderPane.margin>
             <Insets top="10.0" />
